@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, 
+    initial-scale=1.0">
+    <title> HTML CSS nettside </title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="sidebar">
+      <h3>Suggested Users</h3>
+      <ul id="user-list"></ul>
+    </div>
+    <nav class="navbar">
+      <div class="navbar__container">
+        <a href="/" id="navbar__logo"><img src="images/MLGcat.jpg" alt="MLGcat"></i> Supersindres superkule side </a>
+        <div class="navbar__toggle" id="mobile-menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+        <ul class="navbar__menu">
+          <li class="navbar__item">
+            <a href="/" class="navbar__links"> Page 1 </a>
+          </li>
+          <li class="navbar__item">
+              <a href="/" class="navbar__links"> Page 2 </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="section1">
+      <div class="image-card">
+        <div class="post-header">
+          <span class="username">hvit_monster</span>
+          <button class="toggle-btn" data-target="post-1">Hide</button>
+        </div>
+        <div class="post-content" id="post-1">
+          <div class="image-frame">
+            <img src="images/hvitMonster1.jpg" alt="hvitMonster1">
+          </div>
+          <div class="like-section">
+            <button class="like-btn" id="like-btn">
+              <span class="heart">♥</span> Like
+            </button>
+            <span class="like-count" id="like-count">0 likes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section2">
+      <div class="image-card">
+        <div class="post-header">
+          <span class="username">posty_malone</span>
+          <button class="toggle-btn" data-target="post-2">Hide</button>
+        </div>
+        <div class="post-content" id="post-2">
+          <div class="image-frame">
+            <img src="images/posty1.png" alt="posty1">
+          </div>
+          <div class="like-section">
+            <button class="like-btn" id="like-btn-2">
+              <span class="heart">♥</span> Like
+            </button>
+            <span class="like-count" id="like-count-2">0 likes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="footer">
+      <img src="images/Griffin1.png" alt="Griffin">
+      <p>This is the end</p>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>
