@@ -24,3 +24,7 @@ pnpm-debug.log*
 
 # Ignore mock db
 /db.json
+
+# Ignore cypress test videos and screenshots
+/cypress/videos
+/cypress/screenshots
