@@ -95,7 +95,7 @@ export default {
 			}
 
 			const expression = this.result;
-			const apiBaseUrl = process.env.VUE_APP_API_BASE_URL || 'http://localhost:8081';
+			const apiBaseUrl = 'http://localhost:8081';
 
 			try {
 				const response = await axios.post(`${apiBaseUrl}/api/calculator/evaluate`, {
