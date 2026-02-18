@@ -1,11 +1,19 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import Calculator from '@/components/Calculator.vue';
+import axios from 'axios';
+
+vi.mock('axios', () => ({
+	default: {
+		post: vi.fn(),
+	},
+}));
 
 describe('Calculator.vue', () => {
 	let wrapper;
 
 	beforeEach(() => {
+		axios.post.mockReset();
 		wrapper = mount(Calculator, {
 			global: {
 				stubs: {
@@ -106,6 +114,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('5');
 			await wrapper.vm.handleOperatorClick('+');
 			await wrapper.vm.handleClick('3');
+			axios.post.mockResolvedValueOnce({ data: { result: 8 } });
 			await wrapper.vm.calculate();
 			expect(wrapper.vm.result).toBe(8);
 		});
@@ -114,6 +123,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('10');
 			await wrapper.vm.handleOperatorClick('-');
 			await wrapper.vm.handleClick('3');
+			axios.post.mockResolvedValueOnce({ data: { result: 7 } });
 			await wrapper.vm.calculate();
 			expect(wrapper.vm.result).toBe(7);
 		});
@@ -122,6 +132,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('5');
 			await wrapper.vm.handleOperatorClick('*');
 			await wrapper.vm.handleClick('3');
+			axios.post.mockResolvedValueOnce({ data: { result: 15 } });
 			await wrapper.vm.calculate();
 			expect(wrapper.vm.result).toBe(15);
 		});
@@ -130,6 +141,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('15');
 			await wrapper.vm.handleOperatorClick('/');
 			await wrapper.vm.handleClick('3');
+			axios.post.mockResolvedValueOnce({ data: { result: 5 } });
 			await wrapper.vm.calculate();
 			expect(wrapper.vm.result).toBe(5);
 		});
@@ -142,6 +154,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('2');
 			await wrapper.vm.handleClick('.');
 			await wrapper.vm.handleClick('5');
+			axios.post.mockResolvedValueOnce({ data: { result: 8 } });
 			await wrapper.vm.calculate();
 			expect(wrapper.vm.result).toBe(8);
 		});
@@ -152,6 +165,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('3');
 			await wrapper.vm.handleOperatorClick('*');
 			await wrapper.vm.handleClick('4');
+			axios.post.mockResolvedValueOnce({ data: { result: 14 } });
 			await wrapper.vm.calculate();
 			expect(wrapper.vm.result).toBe(14); // 2 + 3 * 4 = 14
 		});
@@ -162,14 +176,20 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('5');
 			await wrapper.vm.handleOperatorClick('/');
 			await wrapper.vm.handleClick('0');
+			axios.post.mockRejectedValueOnce({
+				response: { data: { error: 'Division by zero.' } },
+			});
 			await wrapper.vm.calculate();
-			expect(wrapper.vm.result).toBe('Error: Divide by zero');
+			expect(wrapper.vm.result).toBe('Error: Division by zero.');
 		});
 
 		it('should handle invalid expressions', async () => {
 			wrapper.vm.result = '5++3';
+			axios.post.mockRejectedValueOnce({
+				response: { data: { error: 'Invalid expression.' } },
+			});
 			await wrapper.vm.calculate();
-			expect(wrapper.vm.result).toBe('Error');
+			expect(wrapper.vm.result).toBe('Error: Invalid expression.');
 		});
 	});
 
@@ -207,6 +227,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('5');
 			await wrapper.vm.handleOperatorClick('+');
 			await wrapper.vm.handleClick('3');
+			axios.post.mockResolvedValueOnce({ data: { result: 8 } });
 			await wrapper.vm.calculate();
 			expect(wrapper.vm.log).toContain('5+3 = 8');
 		});
@@ -215,11 +236,13 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('5');
 			await wrapper.vm.handleOperatorClick('+');
 			await wrapper.vm.handleClick('3');
+			axios.post.mockResolvedValueOnce({ data: { result: 8 } });
 			await wrapper.vm.calculate();
 
 			await wrapper.vm.handleClick('2');
 			await wrapper.vm.handleOperatorClick('*');
 			await wrapper.vm.handleClick('4');
+			axios.post.mockResolvedValueOnce({ data: { result: 8 } });
 			await wrapper.vm.calculate();
 
 			expect(wrapper.vm.log.length).toBe(2);
@@ -231,6 +254,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('5');
 			await wrapper.vm.handleOperatorClick('+');
 			await wrapper.vm.handleClick('3');
+			axios.post.mockResolvedValueOnce({ data: { result: 8 } });
 			await wrapper.vm.calculate();
 
 			const logTextarea = wrapper.find('.log');
@@ -243,6 +267,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('5');
 			await wrapper.vm.handleOperatorClick('+');
 			await wrapper.vm.handleClick('3');
+			axios.post.mockResolvedValueOnce({ data: { result: 8 } });
 			await wrapper.vm.calculate();
 			expect(wrapper.vm.calculated).toBe(true);
 		});
@@ -251,6 +276,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('5');
 			await wrapper.vm.handleOperatorClick('+');
 			await wrapper.vm.handleClick('3');
+			axios.post.mockResolvedValueOnce({ data: { result: 8 } });
 			await wrapper.vm.calculate();
 			expect(wrapper.vm.result).toBe(8);
 
@@ -263,6 +289,7 @@ describe('Calculator.vue', () => {
 			await wrapper.vm.handleClick('5');
 			await wrapper.vm.handleOperatorClick('+');
 			await wrapper.vm.handleClick('3');
+			axios.post.mockResolvedValueOnce({ data: { result: 8 } });
 			await wrapper.vm.calculate();
 
 			await wrapper.vm.handleOperatorClick('*');

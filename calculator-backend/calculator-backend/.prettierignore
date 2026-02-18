@@ -1,0 +1,4 @@
+*.java
+target/
+.mvn/
+node_modules/

@@ -41,6 +41,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
 	name: 'CalculatorApp',
 	data() {
@@ -87,27 +89,29 @@ export default {
 			}
 			this.calculated = false; // Reset flag
 		},
-		calculate() {
+		async calculate() {
+			if (!this.result) {
+				return;
+			}
+
+			const expression = this.result;
+			const apiBaseUrl = process.env.VUE_APP_API_BASE_URL || 'http://localhost:8081';
+
 			try {
-				const expression = this.result;
-				let evaluatedResult = eval(this.result.replace(/(^|[^0-9])0+(\d+)/g, '$1$2'));
-				if (evaluatedResult === Infinity || evaluatedResult === -Infinity) {
-					throw new Error('Divide by zero error');
+				const response = await axios.post(`${apiBaseUrl}/api/calculator/evaluate`, {
+					expression,
+				});
+				const evaluatedResult = response.data?.result;
+				if (typeof evaluatedResult !== 'number' || Number.isNaN(evaluatedResult)) {
+					throw new Error('Invalid result');
 				}
-				if (Number.isFinite(evaluatedResult)) {
-					this.log.push(`${expression} = ${evaluatedResult}`);
-					this.result = evaluatedResult;
-				} else {
-					this.result = 'Error';
-				}
+				this.log.push(`${expression} = ${evaluatedResult}`);
+				this.result = evaluatedResult;
 				this.calculated = true;
-				// Set flag to true after calculation
 			} catch (error) {
-				if (error.message === 'Divide by zero error') {
-					this.result = 'Error: Divide by zero';
-				} else {
-					this.result = 'Error';
-				}
+				const serverError = error?.response?.data?.error;
+				this.result = serverError ? `Error: ${serverError}` : 'Error';
+				this.calculated = true;
 			}
 		},
 		goToFeedback() {
@@ -118,7 +122,7 @@ export default {
 </script>
 
 <style scoped>
-    #app {
+#app {
 	font-family: Arial, sans-serif;
 	text-align: center;
 	background-color: hsl(0, 0%, 100%);
@@ -229,5 +233,4 @@ button:hover {
 .page_change:hover {
 	background-color: #0b7dda;
 }
-
 </style>
