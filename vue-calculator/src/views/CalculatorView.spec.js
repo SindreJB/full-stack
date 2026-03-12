@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
-import Calculator from '@/components/Calculator.vue';
+import Calculator from '@/views/CalculatorView.vue';
 import axios from 'axios';
 
 vi.mock('axios', () => ({

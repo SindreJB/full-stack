@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
-import Feedback from '@/components/Feedback.vue';
+import Feedback from '@/views/FeedbackView.vue';
 
 // Mock fetch globally
 global.fetch = vi.fn();
