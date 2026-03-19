@@ -1,4 +1,7 @@
-"# full-stack"
+# IDATT2105 Full-stack application development
+
+This was every assignment for this course. Had fun! won't do it again thoooo..
+
 
 ## Getting Started
 
