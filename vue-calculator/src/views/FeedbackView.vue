@@ -4,6 +4,7 @@
 			<h2>Feedback Form</h2>
 			<div class="page_change_container">
 				<button class="page_change" @click="goToCalculator">Back to Calculator</button>
+				<button class="page_change logout-btn" @click="logout">Log out</button>
 			</div>
 
 			<!-- Status message -->
@@ -56,6 +57,10 @@
 </template>
 
 <script>
+import authService from '../utils/authService';
+import { useUserStore } from '../stores/userStore';
+const FEEDBACK_API_URL = process.env.VUE_APP_FEEDBACK_API_URL || 'http://localhost:3000/feedback';
+
 export default {
 	name: 'FeedbackForm',
 	data() {
@@ -158,7 +163,7 @@ export default {
 		async performSubmission() {
 			try {
 				// Send to json-server backend
-				const response = await fetch('http://localhost:3000/feedback', {
+				const response = await fetch(FEEDBACK_API_URL, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -189,6 +194,11 @@ export default {
 		},
 		goToCalculator() {
 			this.$router.push('/');
+		},
+		logout() {
+			authService.logout();
+			useUserStore().clearAuth();
+			this.$router.push('/login');
 		},
 	},
 };
@@ -307,5 +317,13 @@ export default {
 
 .page_change:hover {
 	background-color: #0b7dda;
+}
+
+.logout-btn {
+	background-color: #e53935;
+}
+
+.logout-btn:hover {
+	background-color: #c62828;
 }
 </style>

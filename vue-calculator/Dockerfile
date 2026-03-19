@@ -8,6 +8,8 @@ COPY . .
 # Default: backend exposed on host port 8081.
 ARG VUE_APP_API_BASE_URL=http://localhost:8081
 ENV VUE_APP_API_BASE_URL=$VUE_APP_API_BASE_URL
+ARG VUE_APP_FEEDBACK_API_URL=http://localhost:3001/feedback
+ENV VUE_APP_FEEDBACK_API_URL=$VUE_APP_FEEDBACK_API_URL
 RUN npm run build
 
 # ── Serve stage ───────────────────────────────────────────────────────────────

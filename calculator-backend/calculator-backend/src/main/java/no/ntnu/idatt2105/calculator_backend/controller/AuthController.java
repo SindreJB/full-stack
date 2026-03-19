@@ -4,21 +4,15 @@ import no.ntnu.idatt2105.calculator_backend.model.AuthRequest;
 import no.ntnu.idatt2105.calculator_backend.model.AuthResponse;
 import no.ntnu.idatt2105.calculator_backend.model.RegisterRequest;
 import no.ntnu.idatt2105.calculator_backend.security.JwtUtil;
+import no.ntnu.idatt2105.calculator_backend.service.AppUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -28,17 +22,14 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private final InMemoryUserDetailsManager userDetailsManager;
-    private final PasswordEncoder passwordEncoder;
+    private final AppUserService appUserService;
 
     public AuthController(AuthenticationManager authenticationManager,
                           JwtUtil jwtUtil,
-                          UserDetailsService userDetailsService,
-                          PasswordEncoder passwordEncoder) {
+                          AppUserService appUserService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
-        this.userDetailsManager = (InMemoryUserDetailsManager) userDetailsService;
-        this.passwordEncoder = passwordEncoder;
+        this.appUserService = appUserService;
     }
 
     @PostMapping("/login")
@@ -61,16 +52,11 @@ public class AuthController {
                 || request.getPassword() == null || request.getPassword().isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Username and password are required"));
         }
-        if (userDetailsManager.userExists(request.getUsername())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("message", "Username already taken"));
+        try {
+            appUserService.register(request.getUsername(), request.getPassword());
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "User registered successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
         }
-        UserDetails newUser = User.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles("USER")
-                .build();
-        userDetailsManager.createUser(newUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "User registered successfully"));
     }
 }

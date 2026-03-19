@@ -1,34 +1,39 @@
 services:
-  backend:
-    build:
-      context: ./calculator-backend/calculator-backend
-    ports:
-      - "8081:8081"
-    restart: unless-stopped
+ backend:
+  build:
+   context: ./calculator-backend/calculator-backend
+  ports:
+   - '8081:8081'
+   - '9092:9092'
+  volumes:
+   - db-data:/data
+  restart: unless-stopped
 
-  json-server:
-    build:
-      context: ./vue-calculator
-      dockerfile: Dockerfile.jsonserver
-    volumes:
-      - json-server-data:/data
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
+ json-server:
+  build:
+   context: ./vue-calculator
+   dockerfile: Dockerfile.jsonserver
+  volumes:
+   - json-server-data:/data
+  ports:
+   - '3001:3000'
+  restart: unless-stopped
 
-  frontend:
-    build:
-      context: ./vue-calculator
-      args:
-        # Must be reachable from the user's browser, not from inside Docker.
-        # Change this if deploying to a remote host.
-        VUE_APP_API_BASE_URL: http://localhost:8081
-    ports:
-      - "8080:80"
-    depends_on:
-      - backend
-      - json-server
-    restart: unless-stopped
+ frontend:
+  build:
+   context: ./vue-calculator
+   args:
+    # Must be reachable from the user's browser, not from inside Docker.
+    # Change this if deploying to a remote host.
+    VUE_APP_API_BASE_URL: http://localhost:8081
+    VUE_APP_FEEDBACK_API_URL: http://localhost:3001/feedback
+  ports:
+   - '8080:80'
+  depends_on:
+   - backend
+   - json-server
+  restart: unless-stopped
 
 volumes:
-  json-server-data:
+ json-server-data:
+ db-data:

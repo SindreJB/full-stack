@@ -11,5 +11,6 @@ RUN ./mvnw package -DskipTests -q
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+COPY src/main/resources/application.properties ./application.properties
 EXPOSE 8081
 ENTRYPOINT ["java", "-jar", "app.jar"]

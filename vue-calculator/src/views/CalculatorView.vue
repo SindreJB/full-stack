@@ -3,9 +3,9 @@
 		<h2>Calculator App</h2>
 		<div class="page_change_container">
 			<button class="page_change" @click="goToFeedback">Go to feedback form</button>
+			<button class="page_change logout-btn" @click="logout">Log out</button>
 		</div>
-		<div class="calculator in Vue">
-			<input type="text" class="result" :value="result" readonly />
+		<div class="calculator in Vue">			<input type="text" class="result" :value="result" readonly />
 			<div class="buttons">
 				<button class="number" @click="handleClick('7')">7</button>
 				<button class="number" @click="handleClick('8')">8</button>
@@ -34,14 +34,18 @@
 			</div>
 		</div>
 		<div>
-			<h3>Log</h3>
+			<h3>History</h3>
 			<textarea class="log" :value="log.join('\n')" readonly></textarea>
+			<button v-if="hasMore" class="load-more-btn" @click="loadMore">Load more</button>
 		</div>
 	</div>
 </template>
 
 <script>
 import axios from 'axios';
+import authService from '../utils/authService';
+import { useUserStore } from '../stores/userStore';
+import calculationService from '../utils/calculationService';
 
 export default {
 	name: 'CalculatorApp',
@@ -49,13 +53,13 @@ export default {
 		return {
 			result: '',
 			calculated: false,
-			log: JSON.parse(localStorage.getItem('calculatorLog') || '[]'),
+			log: [],
+			currentPage: 0,
+			hasMore: false,
 		};
 	},
-	watch: {
-		log(newLog) {
-			localStorage.setItem('calculatorLog', JSON.stringify(newLog));
-		},
+	async mounted() {
+		await this.loadHistory(0);
 	},
 	methods: {
 		handleClick(value) {
@@ -109,17 +113,41 @@ export default {
 				if (typeof evaluatedResult !== 'number' || Number.isNaN(evaluatedResult)) {
 					throw new Error('Invalid result');
 				}
-				this.log.push(`${expression} = ${evaluatedResult}`);
 				this.result = evaluatedResult;
 				this.calculated = true;
+				await calculationService.saveCalculation(expression, evaluatedResult);
+				this.log.unshift(`${expression} = ${evaluatedResult}`);
 			} catch (error) {
 				const serverError = error?.response?.data?.error;
 				this.result = serverError ? `Error: ${serverError}` : 'Error';
 				this.calculated = true;
 			}
 		},
+		async loadHistory(page) {
+			try {
+				const data = await calculationService.getCalculations(page, 10);
+				const entries = data.content.map((c) => `${c.expression} = ${c.result}`);
+				if (page === 0) {
+					this.log = entries;
+				} else {
+					this.log.push(...entries);
+				}
+				this.currentPage = data.number;
+				this.hasMore = !data.last;
+			} catch {
+				// not authenticated yet or network error — log stays empty
+			}
+		},
+		async loadMore() {
+			await this.loadHistory(this.currentPage + 1);
+		},
 		goToFeedback() {
 			this.$router.push('/feedback');
+		},
+		logout() {
+			authService.logout();
+			useUserStore().clearAuth();
+			this.$router.push('/login');
 		},
 	},
 };
@@ -236,5 +264,28 @@ button:hover {
 
 .page_change:hover {
 	background-color: #0b7dda;
+}
+
+.logout-btn {
+	background-color: #e53935;
+}
+
+.logout-btn:hover {
+	background-color: #c62828;
+}
+
+.load-more-btn {
+	margin-top: 8px;
+	padding: 8px 20px;
+	background-color: #757575;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.load-more-btn:hover {
+	background-color: #616161;
 }
 </style>

@@ -238,7 +238,7 @@ describe('Feedback.vue', () => {
 			await flushPromises();
 
 			expect(global.fetch).toHaveBeenCalledWith(
-				'http://localhost:3000/feedback',
+				'http://localhost:3001/feedback',
 				expect.objectContaining({
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
